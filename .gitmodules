@@ -1,0 +1,6 @@
+[submodule "vendor/doctrine-orm"]
+	path = vendor/doctrine-orm
+	url = https://github.com/doctrine/doctrine2.git
+[submodule "vendor/extbase"]
+	path = vendor/extbase
+	url = git://git.typo3.org/TYPO3v4/CoreProjects/MVC/extbase.git
