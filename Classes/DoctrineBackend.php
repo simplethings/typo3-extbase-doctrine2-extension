@@ -1,13 +1,16 @@
 <?php
 
-class Tx_Doctrine2_DoctrineBackend
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManager;
+
+class Tx_Doctrine2_DoctrineBackend implements Tx_Extbase_Persistence_BackendInterface
 {
     /**
      * @var Doctrine\ORM\EntityManager
      */
     private $entityManager;
 
-    public function __construct($entityManager)
+    public function injectEntityManager(EntityManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }
@@ -21,7 +24,8 @@ class Tx_Doctrine2_DoctrineBackend
     public function setAggregateRootObjects(Tx_Extbase_Persistence_ObjectStorage $objects)
     {
         foreach ($objects as $object) {
-            if ( ! $this->entityManager->contains($object)) { // TODO: Change tracking?
+            $class = $this->entityManager->getClassMetadata(get_class($object));
+            if ( ! $this->entityManager->contains($object) || ! $class->isChangeTrackingDeferredImplicit()) {
                 $this->entityManager->persist($object);
             }
         }
