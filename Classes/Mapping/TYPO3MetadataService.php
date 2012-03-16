@@ -6,7 +6,7 @@
  *
  * @author Benjamin Eberlei <eberlei@simplethings.de>
  */
-class Tx_Doctrine2_Mapping_TYPO3MetadataService
+class Tx_Doctrine2_Mapping_TYPO3MetadataService implements Tx_Doctrine2_Mapping_MetadataService
 {
     /**
      * @var Tx_Extbase_Persistence_Mapper_DataMapFactory

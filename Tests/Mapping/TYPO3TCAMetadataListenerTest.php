@@ -1,23 +1,33 @@
 <?php
 
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 
-class Tx_Doctrine2_Tests_Mapping_TYPO3ExtbaseDriverTest extends Tx_Doctrine2_Tests_TestCase
+class Tx_Doctrine2_Tests_Mapping_TYPO3TCAMetadataListenerTest extends Tx_Doctrine2_Tests_TestCase
 {
     private $metadataService;
-    private $driver;
+    private $listener;
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->metadataService = $this->getMock('Tx_Doctrine2_Mapping_TYPO3MetadataService', array('getDataMap', 'getTCAColumnType', 'getTargetEntity'));
-        $this->driver = new Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver();
-        $this->driver->injectMetadataService($this->metadataService);
+        $this->listener = new Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener();
+        $this->listener->injectMetadataService($this->metadataService);
+    }
+
+    public function loadClassMetadata($className)
+    {
+        $metadata = new ClassMetadata($className);
+        $args = new LoadClassMetadataEventArgs($metadata, $this->entityManager);
+        $this->listener->loadClassMetadata($args);
+        return $metadata;
     }
 
     public function testLoadMetadataForAbstractDomainObject()
     {
-        $metadata = new ClassMetadata('Tx_Extbase_DomainObject_AbstractDomainObject');
-        $this->driver->loadMetadataForClass('Tx_Extbase_DomainObject_AbstractDomainObject', $metadata);
+        $metadata = $this->loadClassMetadata('Tx_Doctrine2_DomainObject_AbstractDomainObject');
 
         $this->assertEquals(array('uid'), $metadata->identifier);
         $this->assertEquals(array('uid' => 'uid'), $metadata->fieldNames);
@@ -31,12 +41,11 @@ class Tx_Doctrine2_Tests_Mapping_TYPO3ExtbaseDriverTest extends Tx_Doctrine2_Tes
 
         $this->metadataService->expects($this->once())->method('getDataMap')->will($this->returnValue($dataMap));
 
-        $metadata = new ClassMetadata('Tx_Doctrine2_Tests_Model_Post');
-        $this->driver->loadMetadataForClass('Tx_Doctrine2_Tests_Model_Post', $metadata);
+        $metadata = $this->loadClassMetadata('Tx_Doctrine2_Tests_Model_Post');
 
         $this->assertEquals('posts', $metadata->getTableName());
         $this->assertEquals(array(), $metadata->identifier, 'No identifier, this this inherited from abstract class');
-        $this->assertEquals(array('pid' => 'pid', 'lid' => '_languageUid'), $metadata->fieldNames);
+        $this->assertEquals(array('pid' => 'pid', 'lid' => 'languageUid'), $metadata->fieldNames);
     }
 
     public function testLoadMetadataForClassWithProperties()
@@ -48,8 +57,7 @@ class Tx_Doctrine2_Tests_Mapping_TYPO3ExtbaseDriverTest extends Tx_Doctrine2_Tes
 
         $this->metadataService->expects($this->once())->method('getDataMap')->will($this->returnValue($dataMap));
 
-        $metadata = new ClassMetadata('Tx_Doctrine2_Tests_Model_Post');
-        $this->driver->loadMetadataForClass('Tx_Doctrine2_Tests_Model_Post', $metadata);
+        $metadata = $this->loadClassMetadata('Tx_Doctrine2_Tests_Model_Post');
 
         $this->assertEquals('posts', $metadata->getTableName());
         $this->assertEquals(array(), $metadata->identifier, 'No identifier, this this inherited from abstract class');

@@ -2,6 +2,8 @@
 
 use Doctrine\ORM\Mapping\Driver\Driver;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\Common\EventSubscriber;
 
 /**
  * This mapping driver uses Class Docblocks and TCA Mapping Data to build the
@@ -9,25 +11,32 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
  *
  * @author Benjamin Eberlei <eberlei@simplethings.de>
  */
-class Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver implements Driver
+class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
 {
     /**
-     * @var Tx_Doctrine2_Mapping_TYPO3MetadataService
+     * @var Tx_Doctrine2_Mapping_MetadataService
      */
     protected $metadataService;
 
     /**
-     * @param Tx_Doctrine2_Mapping_TYPO3MetadataService $service
+     * @param Tx_Doctrine2_Mapping_MetadataService $service
      * @return void
      */
-    public function injectMetadataService(Tx_Doctrine2_Mapping_TYPO3MetadataService $service)
+    public function injectMetadataService(Tx_Doctrine2_Mapping_MetadataService $service)
     {
         $this->metadataService = $service;
     }
 
-    public function loadMetadataForClass($className, ClassMetadataInfo $metadata)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $event)
     {
-        if ($className == 'Tx_Extbase_DomainObject_AbstractDomainObject') {
+        if (!($this->metadataService instanceof Tx_Doctrine2_Mapping_MetadataService)) {
+            throw new \RuntimeException("Cannot load Typo3 Metadata without Tx_Doctrine2_Mapping_MetadataService being set on metadata listener.");
+        }
+
+        $metadata = $event->getClassMetadata();
+        $className = $metadata->name;
+
+        if ($className == 'Tx_Doctrine2_DomainObject_AbstractDomainObject') {
             $metadata->isMappedSuperclass = true;
 
             $metadata->mapField(array(
@@ -36,10 +45,15 @@ class Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver implements Driver
                 'id' => true,
                 'type' => 'integer',
             ));
+            $metadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
             return;
         }
 
         $dataMap = $this->metadataService->getDataMap($className);
+        if (!$dataMap) {
+            return;
+        }
+
         $metadata->setPrimaryTable(array('name' => $dataMap->getTableName()));
         // TODO: Save EnableFields and Other metadata stuff into primary table
         // array for later reference in filters and listeners.
@@ -55,7 +69,7 @@ class Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver implements Driver
 
         if ($lidColumnName = $dataMap->getLanguageIdColumnName()) {
             $metadata->mapField(array(
-                'fieldName' => '_languageUid',
+                'fieldName' => 'languageUid',
                 'columnName' => $lidColumnName,
                 'type' => 'integer',
                 'inherited' => 'Tx_Extbase_DomainObject_AbstractDomainObject',
@@ -64,6 +78,7 @@ class Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver implements Driver
 
         $reflClass = new \ReflectionClass($metadata->name);
 
+        // only map to properties that actually exist on the class.
         foreach ($reflClass->getProperties() as $property) {
             if ($property->isStatic() || ! $dataMap->isPersistableProperty($property->getName())) {
                 continue;
@@ -84,7 +99,7 @@ class Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver implements Driver
                         'fieldName' => $columnMap->getPropertyName(),
                         'targetEntity' => $this->metadataService->getTargetEntity($metadata->name, $columnMap->getPropertyName()),
                         'joinColumns' => array(
-                            array('name' => $columnMap->getColumnName(), 'referencedColumnName' => $columnNamp->etParentKeyTableFieldName(),
+                            array('name' => $columnMap->getColumnName(), 'referencedColumnName' => $columnNamp->getParentKeyTableFieldName(),
                         ),
                     )));
                 default:
@@ -106,6 +121,11 @@ class Tx_Doctrine2_Mapping_TYPO3ExtbaseDriver implements Driver
     {
         // TODO: Can we relax this more to the interface?
         return !($className instanceof Tx_Extbase_DomainObject_AbstractDomainObject);
+    }
+
+    public function getSubscribedEvents()
+    {
+        return array('loadClassMetadata');
     }
 }
 

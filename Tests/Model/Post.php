@@ -1,6 +1,9 @@
 <?php
 
-class Tx_Doctrine2_Tests_Model_Post extends Tx_Extbase_DomainObject_AbstractEntity
+/**
+ * @Entity
+ */
+class Tx_Doctrine2_Tests_Model_Post extends Tx_Doctrine2_DomainObject_AbstractDomainObject
 {
     /**
      * @var string
