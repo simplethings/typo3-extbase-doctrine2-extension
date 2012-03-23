@@ -48,9 +48,9 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
         if ($this->entityManager === null) {
             // Bootstrap doctrine
             require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
-            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/lib';
+            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/');
 
-            \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php";
+            \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
 
             // Dev Mode decides if proxies are auto-generated every request
             // and what kind of cache is used for the metadata.
@@ -73,8 +73,14 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
 
             $paths = array();
             foreach (explode(",", $GLOBALS['TYPO3_CONF_VARS']['EXT']['extList']) as $extKey) {
-                $path = t3lib_extMgm::extPath($extKey);
-                $paths[] = $path . "/Classes/Domain/Entity";
+                if ($extKey == 'extbase') {
+                    continue;
+                }
+                
+                $path = t3lib_extMgm::extPath($extKey) . "/Classes/Domain/Model";
+                if (file_exists($path)) {
+                    $paths[] = $path;
+                }
             }
 
             $driverImpl = $config->newDefaultAnnotationDriver($paths);
@@ -88,7 +94,7 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
                 'password' => TYPO3_db_password,
             );
 
-            $metadataService = new Tx_Doctrine2_Mapping_MetadataService();
+            $metadataService = new Tx_Doctrine2_Mapping_TYPO3MetadataService();
             $metadataService->injectReflectionService($this->reflectionService);
             $metadataService->injectDataMapFactory($this->dataMapFactory);
 
@@ -131,12 +137,12 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
         throw new \RuntimeException("not implemented, use Repository");
     }
 
-	public function getObjectDataByQuery(Tx_Extbase_Persistence_QueryInterface $query);
+    public function getObjectCountByQuery(Tx_Extbase_Persistence_QueryInterface $query)
     {
         throw new \RuntimeException("not implemented, use Repository");
     }
 
-	public function registerRepositoryClassName($className)
+    public function registerRepositoryClassName($className)
     {
         // not needed
     }

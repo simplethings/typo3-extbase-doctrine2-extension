@@ -82,7 +82,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
         foreach ($reflClass->getProperties() as $property) {
             if ($property->isStatic() ||
                 ! $dataMap->isPersistableProperty($property->getName()) ||
-                isset ($metadata->fieldMappings[$property->getName()]) {
+                isset ($metadata->fieldMappings[$property->getName()])) {
 
                 continue;
             }
@@ -106,10 +106,10 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
                         ),
                     )));
                 default:
-                    throw new \RuntimeException(sprintf(
-                        "Relation type %s is not yet supported in %s#%s",
-                        $columnMap->getTypeOfRelation(), $metadata->name, $columnMap->getPropertyName()
-                    ));
+//                    throw new \RuntimeException(sprintf(
+//                        "Relation type %s is not yet supported in %s#%s",
+//                        $columnMap->getTypeOfRelation(), $metadata->name, $columnMap->getPropertyName()
+//                    ));
             }
         }
     }

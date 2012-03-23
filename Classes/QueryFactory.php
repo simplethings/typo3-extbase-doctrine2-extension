@@ -11,7 +11,7 @@ class Tx_Doctrine2_QueryFactory implements Tx_Extbase_Persistence_QueryFactoryIn
      * @param \Doctrine\Common\Persistence\ObjectManager $entityManager
      * @return void
      */
-    public function injectEntityManager(\Doctrine\Common\Persistence\ObjectManager $entityManager
+    public function injectEntityManager(\Doctrine\Common\Persistence\ObjectManager $entityManager)
     {
         $this->entityManager = $entityManager;
     }
