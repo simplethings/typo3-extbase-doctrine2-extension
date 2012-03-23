@@ -47,6 +47,10 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
     {
         if ($this->entityManager === null) {
             // Bootstrap doctrine
+            require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
+            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/lib';
+
+            \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php";
 
             // Dev Mode decides if proxies are auto-generated every request
             // and what kind of cache is used for the metadata.
@@ -57,9 +61,6 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
             } else {
                 $cache = new \Doctrine\Common\Cache\ApcCache;
             }
-
-            require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
-            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/lib';
 
             $config = new \Doctrine\ORM\Configuration();
             if ($isDevMode) {
