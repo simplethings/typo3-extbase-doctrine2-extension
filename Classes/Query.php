@@ -52,6 +52,11 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
      */
     protected $joins;
 
+    public function __construct($entityClassName)
+    {
+        $this->entityClassName = $entityClassName;
+    }
+
     /**
      * @param \Doctrine\Common\Persistence\ObjectManager $entityManager
      * @return void
@@ -125,7 +130,7 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
         $originalQuery = $this->queryBuilder->getQuery();
         $dqlQuery = clone $originalQuery;
         $dqlQuery->setParameters($originalQuery->getParameters());
-        $dqlQuery->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array('TYPO3\FLOW3\Persistence\Doctrine\CountWalker'));
+        $dqlQuery->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array('Doctrine\ORM\Tools\Pagination\CountWalker'));
         return (int)$dqlQuery->getSingleScalarResult();
     }
 
