@@ -4,6 +4,35 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
 {
     private $entityManager;
 
+    /**
+     * @var Tx_Extbase_Persistence_Mapper_DataMapFactory
+     */
+    protected $dataMapFactory;
+
+    /**
+     * @var Tx_Extbase_Reflection_Service
+     */
+    protected $reflectionService;
+
+    /**
+     * Injects the reflection service
+     *
+     * @param Tx_Extbase_Reflection_Service $reflectionService
+     * @return void
+     */
+    public function injectReflectionService(Tx_Extbase_Reflection_Service $reflectionService)
+    {
+        $this->reflectionService = $reflectionService;
+    }
+
+    /**
+     * @param Tx_Extbase_Persistence_Mapper_DataMapFactory $factory
+     */
+    public function injectDataMapFactory(Tx_Extbase_Persistence_Mapper_DataMapFactory $factory)
+    {
+        $this->dataMapFactory = $factory;
+    }
+
     public function getSession()
     {
         throw new \RuntimeException("Deprecated on interface, not implemented.");
@@ -17,10 +46,12 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
     public function getEntityManager()
     {
         if ($this->entityManager === null) {
-            $db = $GLOBALS['TYPO3_DB'];
             // Bootstrap doctrine
 
+            // Dev Mode decides if proxies are auto-generated every request
+            // and what kind of cache is used for the metadata.
             $isDevMode = t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), $GLOBALS['TYPO3_CONF_VARS']['SYS']['devIPmask']);
+
             if ($isDevMode || ! extension_loaded('apc')) {
                 $cache = new \Doctrine\Common\Cache\ArrayCache;
             } else {
@@ -56,8 +87,15 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
                 'password' => TYPO3_db_password,
             );
 
+            $metadataService = new Tx_Doctrine2_Mapping_MetadataService();
+            $metadataService->injectReflectionService($this->reflectionService);
+            $metadataService->injectDataMapFactory($this->dataMapFactory);
+
+            $metadataListener = new Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener;
+            $metadataListener->injectMetadataService($metadataService);
+
             $evm = new \Doctrine\Common\EventManager;
-            $evm->addEventSubscriber();
+            $evm->addEventSubscriber($metadataListener);
 
             $this->entityManager = \Doctrine\ORM\EntityManager::create($dbParams, $config, $evm);
         }
@@ -89,12 +127,12 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
 
     public function getObjectDataByQuery(Tx_Extbase_Persistence_QueryInterface $query)
     {
-
+        throw new \RuntimeException("not implemented, use Repository");
     }
 
 	public function getObjectDataByQuery(Tx_Extbase_Persistence_QueryInterface $query);
     {
-
+        throw new \RuntimeException("not implemented, use Repository");
     }
 
 	public function registerRepositoryClassName($className)
