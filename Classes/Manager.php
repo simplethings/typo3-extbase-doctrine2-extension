@@ -1,7 +1,15 @@
 <?php
 
+/**
+ * Implements a Doctrine version of the Persistence ManagerInterface
+ *
+ * @author Benjamin Eberlei <eberlei@simplethings.de>
+ */
 class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
 {
+    /**
+     * @var \Doctrine\ORM\EntityManager
+     */
     private $entityManager;
 
     /**
@@ -43,6 +51,16 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
         throw new \RuntimeException("Deprecated on interface, not implemented.");
     }
 
+    public function resetEntityManager()
+    {
+        $this->entityManager = null;
+    }
+
+    /**
+     * Get the Doctrine EntityManager
+     *
+     * @return \Doctrine\ORM\EntityManager
+     */
     public function getEntityManager()
     {
         if ($this->entityManager === null) {
@@ -56,33 +74,18 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
             // and what kind of cache is used for the metadata.
             $isDevMode = t3lib_div::cmpIP(t3lib_div::getIndpEnv('REMOTE_ADDR'), $GLOBALS['TYPO3_CONF_VARS']['SYS']['devIPmask']);
 
-            if ($isDevMode || ! extension_loaded('apc')) {
-                $cache = new \Doctrine\Common\Cache\ArrayCache;
-            } else {
-                $cache = new \Doctrine\Common\Cache\ApcCache;
-            }
-
             $config = new \Doctrine\ORM\Configuration();
             if ($isDevMode) {
                 $config->setAutoGenerateProxyClasses(true);
             }
-            $config->setMetadataCacheImpl($cache);
-            $config->setQueryCacheImpl($cache);
             $config->setProxyDir(PATH_site . 'typo3temp/doctrine2');
             $config->setProxyNamespace('TxDoctrine2Proxies');
 
-            $paths = array();
-            foreach (explode(",", $GLOBALS['TYPO3_CONF_VARS']['EXT']['extList']) as $extKey) {
-                if ($extKey == 'extbase') {
-                    continue;
-                }
-                
-                $path = t3lib_extMgm::extPath($extKey) . "/Classes/Domain/Model";
-                if (file_exists($path)) {
-                    $paths[] = $path;
-                }
-            }
+            $cache = $this->createCache($isDevMode);
+            $config->setMetadataCacheImpl($cache);
+            $config->setQueryCacheImpl($cache);
 
+            $paths = $this->getEntityDirectories();
             $driverImpl = $config->newDefaultAnnotationDriver($paths);
             $config->setMetadataDriverImpl($driverImpl);
 
@@ -94,19 +97,76 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
                 'password' => TYPO3_db_password,
             );
 
-            $metadataService = new Tx_Doctrine2_Mapping_TYPO3MetadataService();
-            $metadataService->injectReflectionService($this->reflectionService);
-            $metadataService->injectDataMapFactory($this->dataMapFactory);
+            $config->addFilter('enableFields', 'Tx_Doctrine2_Persistence_EnableFieldsFilter');
 
-            $metadataListener = new Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener;
-            $metadataListener->injectMetadataService($metadataService);
+            if ( ! \Doctrine\DBAL\Types\Type::hasType('timestamp')) {
+                \Doctrine\DBAL\Types\Type::addType('timestamp', 'Tx_Doctrine2_Types_TimestampType');
+            }
 
-            $evm = new \Doctrine\Common\EventManager;
-            $evm->addEventSubscriber($metadataListener);
-
-            $this->entityManager = \Doctrine\ORM\EntityManager::create($dbParams, $config, $evm);
+            $this->entityManager = \Doctrine\ORM\EntityManager::create(
+                $dbParams,
+                $config,
+                $this->createEventManager()
+            );
+            $this->entityManager->getFilters('enableFields')->enable();
         }
         return $this->entityManager;
+    }
+
+    protected function createCache($isDevMode)
+    {
+        if ($isDevMode || ! extension_loaded('apc')) {
+            $cache = new \Doctrine\Common\Cache\ArrayCache;
+        } else {
+            $cache = new \Doctrine\Common\Cache\ApcCache;
+        }
+        return $cache;
+    }
+
+    /**
+     * All directories to look for entities.
+     *
+     * @return array
+     */
+    protected function getEntityDirectories()
+    {
+        $paths = array();
+        foreach (explode(",", $GLOBALS['TYPO3_CONF_VARS']['EXT']['extList']) as $extKey) {
+            if ($extKey == 'extbase') {
+                continue;
+            }
+
+            $path = t3lib_extMgm::extPath($extKey) . "/Classes/Domain/Model";
+            if (file_exists($path)) {
+                $paths[] = $path;
+            }
+        }
+        return $paths;
+    }
+
+    protected function createEventManager()
+    {
+        $metadataService = new Tx_Doctrine2_Mapping_TYPO3MetadataService();
+        $metadataService->injectReflectionService($this->reflectionService);
+        $metadataService->injectDataMapFactory($this->dataMapFactory);
+
+        $metadataListener = new Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener;
+        $metadataListener->injectMetadataService($metadataService);
+
+        $evm = new \Doctrine\Common\EventManager;
+        $evm->addEventSubscriber($metadataListener);
+
+        return $evm;
+    }
+
+    /**
+     * Hook method to register own event managers
+     *
+     * @return void
+     */
+    protected function configureEventManager(\Doctrine\Comon\EventManager $evm)
+    {
+
     }
 
     public function persistAll()

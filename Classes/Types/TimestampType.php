@@ -2,6 +2,11 @@
 
 use Doctrine\DBAL\Types\Type;
 
+/**
+ * New datatype for integer based timestamps.
+ *
+ * @author Benjamin Eberlei <eberlei@simplethings.de>
+ */
 class Tx_Doctrine2_Types_TimestampType extends Type
 {
     public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
