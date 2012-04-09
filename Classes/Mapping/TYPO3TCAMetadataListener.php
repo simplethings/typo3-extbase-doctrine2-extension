@@ -49,6 +49,10 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
             return;
         }
 
+        if ( ! is_subclass_of($className, 'Tx_Doctrine2_DomainObject_AbstractDomainObject')) {
+            return;
+        }
+
         $dataMap = $this->metadataService->getDataMap($className);
         if (!$dataMap) {
             return;
@@ -112,18 +116,6 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
 //                    ));
             }
         }
-    }
-
-    public function getAllClassNames()
-    {
-        // TODO: Delegate to metadata service, getting this from TYPO3
-        return array();
-    }
-
-    public function isTransient($className)
-    {
-        // TODO: Can we relax this more to the interface?
-        return !($className instanceof Tx_Extbase_DomainObject_AbstractDomainObject);
     }
 
     public function getSubscribedEvents()
