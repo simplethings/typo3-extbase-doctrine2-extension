@@ -16,7 +16,7 @@ class Tx_Doctrine2_Persistence_EnableFieldsFilter extends SQLFilter
     {
         $tableName = $targetEntity->table['name'];
 
-        if ( ! isset($GLOBALS{'TSFE'])) {
+        if ( ! isset($GLOBALS['TSFE'])) {
             return '';
         }
 

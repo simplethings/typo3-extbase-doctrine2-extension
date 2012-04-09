@@ -26,3 +26,16 @@ spl_autoload_register(function($class) {
     }
 });
 
+Tx_Doctrine2_Manager::setDevMode(true);
+
+// "Mocking" TYPO3
+define('PATH_site', __DIR__);
+$GLOBALS['TYPO3_CONF_VARS']['EXT']['extList'] = 'extbase';
+
+define('TYPO3_db', 'doctrine');
+define('TYPO3_db_host', 'localhost');
+define('TYPO3_db_username', 'root');
+define('TYPO3_db_password', '');
+
+interface t3lib_singleton {}
+

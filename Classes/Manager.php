@@ -31,6 +31,13 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
      */
     static protected $devMode = null;
 
+    /**
+     * Flag if autoloading is bootstrapped.
+     *
+     * @var bool
+     */
+    static protected $bootstrapped = false;
+
     static public function setDevMode($devMode)
     {
         self::$devMode = (bool)$devMode;
@@ -82,6 +89,18 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
         $this->entityManager = null;
     }
 
+    static private function bootstrapAutoloading()
+    {
+        if (!self::$bootstrapped) {
+            self::$bootstrapped = true;
+
+            require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
+            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/');
+
+            \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
+        }
+    }
+
     /**
      * Get the Doctrine EntityManager
      *
@@ -93,11 +112,7 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
             return $this->entityManager;
         }
 
-        // Bootstrap doctrine
-        require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
-        \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/');
-
-        \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
+        self::bootstrapAutoloading();
 
         // Dev Mode decides if proxies are auto-generated every request
         // and what kind of cache is used for the metadata.
@@ -118,25 +133,30 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
         $driverImpl = $config->newDefaultAnnotationDriver($paths);
         $config->setMetadataDriverImpl($driverImpl);
 
-        $dbParams = array(
-            'driver'    => 'pdo_mysql',
-            'host'      => TYPO3_db_host,
-            'dbname'    => TYPO3_db,
-            'user'      => TYPO3_db_username,
-            'password'  => TYPO3_db_password,
-        );
-
         $config->addFilter('enableFields', 'Tx_Doctrine2_Persistence_EnableFieldsFilter');
 
         if ( ! \Doctrine\DBAL\Types\Type::hasType('timestamp')) {
             \Doctrine\DBAL\Types\Type::addType('timestamp', 'Tx_Doctrine2_Types_TimestampType');
         }
 
+        $dbParams = $this->getDatabaseParams();
         $evm = $this->createEventManager();
+
         $this->entityManager = \Doctrine\ORM\EntityManager::create($dbParams, $config, $evm);
-        $this->entityManager->getFilters('enableFields')->enable();
+        $this->entityManager->getFilters('enableFields')->enable('enableFields');
 
         return $this->entityManager;
+    }
+
+    protected function getDatabaseParams()
+    {
+        return array(
+            'driver'    => 'pdo_mysql',
+            'host'      => TYPO3_db_host,
+            'dbname'    => TYPO3_db,
+            'user'      => TYPO3_db_username,
+            'password'  => TYPO3_db_password,
+        );
     }
 
     protected function createCache($isDevMode)
@@ -192,7 +212,7 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
      *
      * @return void
      */
-    protected function configureEventManager(\Doctrine\Comon\EventManager $evm)
+    protected function configureEventManager(\Doctrine\Common\EventManager $evm)
     {
 
     }

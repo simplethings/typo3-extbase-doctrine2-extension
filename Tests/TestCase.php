@@ -11,10 +11,12 @@ class Tx_Doctrine2_Tests_TestCase extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         $params = array('driver' => 'pdo_sqlite', 'memory' => true);
+
         $config = new Configuration();
         $config->setMetadataDriverImpl($config->newDefaultAnnotationDriver());
         $config->setProxyDir(sys_get_temp_dir());
         $config->setProxyNamespace('MyProxy');
+
         $listener = new Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener();
         $listener->injectMetadataService(new Tx_Doctrine2_Tests_Model_MockMetadataService());
 
