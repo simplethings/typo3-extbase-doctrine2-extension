@@ -64,19 +64,19 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
 
         if ($pidColumnName = $dataMap->getPageIdColumnName()) {
             $metadata->mapField(array(
-                'fieldName' => 'pid',
-                'columnName' => $pidColumnName,
-                'type' => 'integer',
-                'inherited' => 'Tx_Extbase_DomainObject_AbstractDomainObject',
+                'fieldName'     => 'pid',
+                'columnName'    => $pidColumnName,
+                'type'          => 'integer',
+                'inherited'     => 'Tx_Extbase_DomainObject_AbstractDomainObject',
             ));
         }
 
         if ($lidColumnName = $dataMap->getLanguageIdColumnName()) {
             $metadata->mapField(array(
-                'fieldName' => 'languageUid',
-                'columnName' => $lidColumnName,
-                'type' => 'integer',
-                'inherited' => 'Tx_Extbase_DomainObject_AbstractDomainObject',
+                'fieldName'     => 'languageUid',
+                'columnName'    => $lidColumnName,
+                'type'          => 'integer',
+                'inherited'     => 'Tx_Extbase_DomainObject_AbstractDomainObject',
             ));
         }
 
