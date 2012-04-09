@@ -38,14 +38,23 @@ Extbase ORM uses the `Tx_Extbase_Persistence_ObjectStorge` as collection for obj
 
 ### Interfaces and Implementations
 
-* `Tx_Extbase_Persistence_ManagerInterface` needs an implementation. This is relevant for userland code (controllers).
-* `Tx_Extbase_Persistence_BackendInterface` only necessary for the default manager, which will be replaced.
-* `Tx_Extbase_Persistence_QueryInterface` will be swaped and QueryResultInterface, QueryFactoryInterface and all Logical Operators
-* `Tx_Extbase_Persistence_RepositoryInterface` is an important class and should mimic the original one as closely as possible to make a switch easy.
+None of the Extbase Persistence code will be reused. Instead the following interfaces are newly implemented:
+
+* ManagerInterface
+* RepositoryInterface
+* QueryInterface
+* QueryFactoryInterface
+* QueryResultInterface
 
 ## Bootstrapping Extbase
 
-The Extbase ORM has a fatal flaw. It calls "persist all" whenever a plugin is shutdown. This leads to lots of "comparing and checking" overhead. The Flush operation should be called explicitly by developers. That is why the Bootstrap has to be overwritten to disable this functionality: `Tx_Doctrine2_ExtbaseBootstrap` does this.
+The Extbase ORM has a serious flaw with regard to performance. It calls "persist all" whenever a plugin is shutdown. This leads to lots of "comparing and checking" overhead. The Flush operation should be called explicitly by developers. That is why the Bootstrap has to be overwritten to disable this functionality: `Tx_Doctrine2_ExtbaseBootstrap` does this.
+
+Practically this means you have to call `Tx_Doctrine2_Manager#persistAll()` when you actually want changes to be written to the database.
+
+## Doctrine Proxy Objects
+
+Generation of proxy objects is hooked into the TYPO3 Cache clearing mechanism.
 
 ## Notes
 
