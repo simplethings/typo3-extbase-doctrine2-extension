@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Extbase Query using Doctrine2 backend.
+ *
+ * The code is mostly copied from the FLOW3 Query object and adjusted where
+ * necessary.
+ */
 class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
 {
     /**
