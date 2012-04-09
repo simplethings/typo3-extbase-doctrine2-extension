@@ -96,24 +96,20 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
             switch ($columnMap->getTypeOfRelation()) {
                 case Tx_Extbase_Persistence_Mapper_ColumnMap::RELATION_NONE:
                     $metadata->mapField(array(
-                        'fieldName' => $columnMap->getPropertyName(),
-                        'columnName' => $columnMap->getColumnName(),
-                        'type' => $this->metadataService->getTCAColumnType($dataMap->getTableName(), $columnMap->getColumnName()),
+                        'fieldName'     => $columnMap->getPropertyName(),
+                        'columnName'    => $columnMap->getColumnName(),
+                        'type'          => $this->metadataService->getTCAColumnType($dataMap->getTableName(), $columnMap->getColumnName()),
                     ));
                     break;
                 case Tx_Extbase_Persistence_Mapper_ColumnMap::RELATION_HAS_ONE:
                     $metadata->mapManyToOne(array(
-                        'fieldName' => $columnMap->getPropertyName(),
-                        'targetEntity' => $this->metadataService->getTargetEntity($metadata->name, $columnMap->getPropertyName()),
-                        'joinColumns' => array(
+                        'fieldName'     => $columnMap->getPropertyName(),
+                        'targetEntity'  => $this->metadataService->getTargetEntity($metadata->name, $columnMap->getPropertyName()),
+                        'joinColumns'   => array(
                             array('name' => $columnMap->getColumnName(), 'referencedColumnName' => $columnNamp->getParentKeyTableFieldName(),
                         ),
                     )));
-                default:
-//                    throw new \RuntimeException(sprintf(
-//                        "Relation type %s is not yet supported in %s#%s",
-//                        $columnMap->getTypeOfRelation(), $metadata->name, $columnMap->getPropertyName()
-//                    ));
+                    break;
             }
         }
     }
