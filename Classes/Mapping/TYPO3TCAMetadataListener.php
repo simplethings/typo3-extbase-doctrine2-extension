@@ -34,18 +34,28 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
         }
 
         $metadata = $event->getClassMetadata();
+        $this->addTypo3Metadata($metadata);
+    }
+
+    private function loadAbstractDomainObject(ClassMetadataInfo $metadata)
+    {
+        $metadata->isMappedSuperclass = true;
+
+        $metadata->mapField(array(
+                    'fieldName' => 'uid',
+                    'columnName' => 'uid',
+                    'id' => true,
+                    'type' => 'integer',
+                    ));
+        $metadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
+    }
+
+    private function addTypo3Metadata(ClassMetadataInfo $metadata)
+    {
         $className = $metadata->name;
 
         if ($className == 'Tx_Doctrine2_DomainObject_AbstractDomainObject') {
-            $metadata->isMappedSuperclass = true;
-
-            $metadata->mapField(array(
-                'fieldName' => 'uid',
-                'columnName' => 'uid',
-                'id' => true,
-                'type' => 'integer',
-            ));
-            $metadata->setIdGeneratorType(ClassMetadataInfo::GENERATOR_TYPE_AUTO);
+            $this->loadAbstractDomainObject($metadata);
             return;
         }
 
@@ -54,7 +64,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
         }
 
         $dataMap = $this->metadataService->getDataMap($className);
-        if (!$dataMap) {
+        if ( ! $dataMap) {
             return;
         }
 
