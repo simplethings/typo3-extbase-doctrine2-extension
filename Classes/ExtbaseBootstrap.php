@@ -17,6 +17,8 @@ class Tx_Doctrine2_ExtbaseBootstrap extends Tx_Extbase_Core_Bootstrap
     
     public function initializePersistence() 
     {
-        $this->persistenceManager = $this->objectManager->get('Tx_Doctrince2_Manager'); // singleton
+        $this->persistenceManager = $this->objectManager->get('Tx_Doctrine2_Manager'); // singleton
     }
+    
+    protected function initializeBackwardsCompatibility() {}
 }
