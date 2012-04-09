@@ -53,7 +53,7 @@ class Tx_Doctrine2_Mapping_TYPO3MetadataService implements Tx_Doctrine2_Mapping_
      */
     public function getTargetEntity($className, $propertyName)
     {
-        $propertyMetaData = $this->reflectionService->getClassSchema($parentClassName)->getProperty($propertyName);
+        $propertyMetaData = $this->reflectionService->getClassSchema($className)->getProperty($propertyName);
         if (!empty($propertyMetaData['elementType'])) {
             $type = $propertyMetaData['elementType'];
         } elseif (!empty($propertyMetaData['type'])) {
@@ -67,11 +67,17 @@ class Tx_Doctrine2_Mapping_TYPO3MetadataService implements Tx_Doctrine2_Mapping_
     public function getTCAColumnType($tableName, $columnName)
     {
         global $TCA;
-        if (!isset($TCA[$tableName]['columns'][$columnName])) {
+        if (!isset($TCA[$tableName]['columns'][$columnName]['config']['type'])) {
             throw new \RuntimeException("Cannot find column $tableName.$columnName in TCA");
         }
-        switch ($TCA[$tableName]['columns'][$columnName]) {
+        switch ($TCA[$tableName]['columns'][$columnName]['config']['type']) {
             case 'input':
+                $data = $TCA[$tableName]['columns'][$columnName]['config'];
+                if (isset($data['eval'])) {
+                    if (strpos($data['eval'], "datetime") !== false) {
+                        return "timestamp";
+                    }
+                }
                 return 'string';
             case 'text':
                 return 'text';

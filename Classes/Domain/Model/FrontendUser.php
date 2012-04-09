@@ -26,6 +26,7 @@
  * A Frontend User
  *
  * @entity
+ * @Table(name="fe_users")
  */
 class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_AbstractEntity {
 
@@ -40,7 +41,8 @@ class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_A
 	protected $password;
 
 	/**
-	 * @var Tx_Doctrine2_Persistence_ObjectStorage<Tx_Doctrine2_Domain_Model_FrontendUserGroup>
+     * @ManyToMany(targetEntity="Tx_Doctrine2_Domain_Model_FrontendUserGroup")
+	 * @var Tx_Doctrine2_Domain_Model_FrontendUserGroup[]
 	 */
 	protected $usergroup;
 
@@ -142,7 +144,7 @@ class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_A
 	public function __construct($username = '', $password = '') {
 		$this->username = $username;
 		$this->password = $password;
-		$this->usergroup = new Tx_Doctrine2_Persistence_ObjectStorage();
+		$this->usergroup = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**
@@ -195,7 +197,7 @@ class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_A
 	 * @return void
 	 * @api
 	 */
-	public function setUsergroup(Tx_Doctrine2_Persistence_ObjectStorage $usergroup) {
+	public function setUsergroup($usergroup) {
 		$this->usergroup = $usergroup;
 	}
 
@@ -207,7 +209,7 @@ class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_A
 	 * @api
 	 */
 	public function addUsergroup(Tx_Doctrine2_Domain_Model_FrontendUserGroup $usergroup) {
-		$this->usergroup->attach($usergroup);
+		$this->usergroup[] = $usergroup;
 	}
 
 	/**
@@ -218,7 +220,7 @@ class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_A
 	 * @api
 	 */
 	public function removeUsergroup(Tx_Doctrine2_Domain_Model_FrontendUserGroup $usergroup) {
-		$this->usergroup->detach($usergroup);
+		$this->usergroup->remove($usergroup);
 	}
 
 	/**

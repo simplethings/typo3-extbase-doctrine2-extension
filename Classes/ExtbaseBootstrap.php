@@ -14,11 +14,13 @@ class Tx_Doctrine2_ExtbaseBootstrap extends Tx_Extbase_Core_Bootstrap
     {
         $this->reflectionService->shutdown();
     }
-    
-    public function initializePersistence() 
+
+    public function initializePersistence()
     {
         $this->persistenceManager = $this->objectManager->get('Tx_Doctrine2_Manager'); // singleton
     }
-    
-    protected function initializeBackwardsCompatibility() {}
+
+    protected function initializeBackwardsCompatibility()
+    {
+    }
 }

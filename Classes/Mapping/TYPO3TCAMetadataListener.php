@@ -67,7 +67,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
         if ( ! $dataMap) {
             return;
         }
-        
+
         if ($metadata->reflClass->getShortname() == $metadata->table['name']) {
             $metadata->table['name'] = strtolower($metadata->table['name']);
         }
@@ -76,7 +76,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
         // TODO: Save EnableFields and Other metadata stuff into primary table
         // array for later reference in filters and listeners.
 
-        if ($pidColumnName = $dataMap->getPageIdColumnName()) {
+        if ($pidColumnName = $dataMap->getPageIdColumnName() && isset($metadata->fieldMappings['pid'])) {
             $metadata->mapField(array(
                 'fieldName'     => 'pid',
                 'columnName'    => $pidColumnName,
@@ -84,7 +84,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
             ));
         }
 
-        if ($lidColumnName = $dataMap->getLanguageIdColumnName()) {
+        if ($lidColumnName = $dataMap->getLanguageIdColumnName() && isset($metadata->fieldMappings['languageUid'])) {
             $metadata->mapField(array(
                 'fieldName'     => 'languageUid',
                 'columnName'    => $lidColumnName,
@@ -98,7 +98,8 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
         foreach ($reflClass->getProperties() as $property) {
             if ($property->isStatic() ||
                 ! $dataMap->isPersistableProperty($property->getName()) ||
-                isset ($metadata->fieldMappings[$property->getName()])) {
+                isset ($metadata->fieldMappings[$property->getName()]) ||
+                isset ($metadata->associationMappings[$property->getName()])) {
 
                 continue;
             }
@@ -118,8 +119,9 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
                         'fieldName'     => $columnMap->getPropertyName(),
                         'targetEntity'  => $this->metadataService->getTargetEntity($metadata->name, $columnMap->getPropertyName()),
                         'joinColumns'   => array(
-                            array('name' => $columnMap->getColumnName(), 'referencedColumnName' => $columnNamp->getParentKeyTableFieldName(),
+                            array('name' => $columnMap->getColumnName(), 'referencedColumnName' => $columnMap->getParentTableFieldName(),
                         ),
+                        'cascade' => array('persist')
                     )));
                     break;
             }

@@ -5,7 +5,7 @@
  *
  * @author Benjamin Eberlei <eberlei@simplethings.de>
  */
-class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
+class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t3lib_Singleton
 {
     /**
      * @var \Doctrine\ORM\EntityManager
@@ -181,14 +181,14 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface
             if (in_array($extKey, explode(',', 'extbase,css_styled_content,info,perm,func,filelist,about,tsconfig_help,context_help,extra_page_cm_options,impexp,sys_note,tstemplate,tstemplate_ceditor,tstemplate_info,tstemplate_objbrowser,tstemplate_analyzer,func_wizards,wizard_crpages,wizard_sortpages,lowlevel,install,belog,beuser,aboutmodules,setup,taskcenter,info_pagetsconfig,viewpage,rtehtmlarea,t3skin,t3editor,reports,felogin,form,introduction,rsaauth,saltedpasswords,fluid,version,workspaces,scheduler,linkvalidator'))) { // @todo
                 continue;
             }
-            
+
             try {
                 $path = t3lib_extMgm::extPath($extKey) . "/Classes/Domain/Model";
                 if (file_exists($path)) {
                     $paths[] = $path;
                 }
             } catch (Exception $e) {
-                
+
             }
         }
         return $paths;

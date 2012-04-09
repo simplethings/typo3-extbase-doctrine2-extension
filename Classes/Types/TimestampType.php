@@ -17,13 +17,13 @@ class Tx_Doctrine2_Types_TimestampType extends Type
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
-        return ($value !== null)
-            ? $value->format('U') : null;
+        return ($value instanceof \DateTime)
+            ? $value->format('U') : 0;
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform)
     {
-        if ($value === null) {
+        if ($value === null || $value == 0) {
             return null;
         }
 

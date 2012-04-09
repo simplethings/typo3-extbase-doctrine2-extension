@@ -165,7 +165,7 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
         $this->defaultOrderings = $defaultOrderings;
     }
 
-    public function setDefaultQuerySettings(Tx_Extbase_Persistence_QuerySettingsInterface $defaultQuerySettings) 
+    public function setDefaultQuerySettings(Tx_Extbase_Persistence_QuerySettingsInterface $defaultQuerySettings)
     {
         $this->defaultQuerySettings = $defaultQuerySettings;
     }
