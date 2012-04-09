@@ -62,7 +62,7 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
     protected $defaultQuerySettings;
 
     /**
-     * @param Tx_Extbase_Object_ObjectManagerInterface $objectManager 
+     * @param Tx_Extbase_Object_ObjectManagerInterface $objectManager
      */
     public function __construct(Tx_Extbase_Object_ObjectManagerInterface $objectManager = null)
     {
@@ -160,7 +160,7 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
         return $this->entityManager->getRepository($this->objectType)->find($uid);
     }
 
-    public function setDefaultOrderings(array $defaultOrderings) 
+    public function setDefaultOrderings(array $defaultOrderings)
     {
         $this->defaultOrderings = $defaultOrderings;
     }
