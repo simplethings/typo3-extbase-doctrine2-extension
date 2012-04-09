@@ -28,6 +28,11 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
     protected $orderings;
 
     /**
+     * @var Tx_Extbase_Persistence_QuerySettingsInterface
+     */
+    protected $querySettings;
+
+    /**
      * @var integer
      */
     protected $limit;
@@ -153,6 +158,11 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
             $this->queryBuilder->addOrderBy($this->getPropertyNameWithAlias($propertyName), $order);
         }
         return $this;
+    }
+
+    public function getOrderings()
+    {
+        return $this->orderings;
     }
 
     /**

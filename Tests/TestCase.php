@@ -22,5 +22,16 @@ class Tx_Doctrine2_Tests_TestCase extends PHPUnit_Framework_TestCase
         $evm->addEventSubscriber($listener);
         $this->entityManager = EntityManager::create($params, $config, $evm);
     }
+
+    public function setupDatabase(array $classes)
+    {
+        $metadata = array();
+        foreach ($classes as $className)  {
+            $metadata[] = $this->entityManager->getClassMetadata($className);
+        }
+
+        $schemaTool = new \Doctrine\ORM\Tools\SchemaTool($this->entityManager);
+        $schemaTool->createSchema($metadata);
+    }
 }
 
