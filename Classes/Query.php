@@ -8,6 +8,7 @@
  */
 class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
 {
+
     /**
      * @var string
      */
@@ -67,6 +68,11 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
     {
         $this->entityClassName = $entityClassName;
     }
+    
+    public function getResult()
+    {
+        return $this->queryBuilder->getQuery()->getResult();
+    }
 
     /**
      * @param \Doctrine\Common\Persistence\ObjectManager $entityManager
@@ -78,43 +84,43 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
         $this->queryBuilder = $entityManager->createQueryBuilder()->select('e')->from($this->entityClassName, 'e');
     }
 
-	/**
-	 * Sets the Query Settings. These Query settings must match the settings expected by
-	 * the specific Storage Backend.
-	 *
-	 * @param Tx_Extbase_Persistence_QuerySettingsInterface $querySettings The Query Settings
-	 * @return void
-	 * @api This method is not part of FLOW3 API
-	 */
-	public function setQuerySettings(Tx_Extbase_Persistence_QuerySettingsInterface $querySettings)
+    /**
+     * Sets the Query Settings. These Query settings must match the settings expected by
+     * the specific Storage Backend.
+     *
+     * @param Tx_Extbase_Persistence_QuerySettingsInterface $querySettings The Query Settings
+     * @return void
+     * @api This method is not part of FLOW3 API
+     */
+    public function setQuerySettings(Tx_Extbase_Persistence_QuerySettingsInterface $querySettings)
     {
-		$this->querySettings = $querySettings;
-	}
+        $this->querySettings = $querySettings;
+    }
 
-	/**
-	 * Returns the Query Settings.
-	 *
-	 * @return Tx_Extbase_Persistence_QuerySettingsInterface $querySettings The Query Settings
-	 * @api This method is not part of FLOW3 API
-	 */
-	public function getQuerySettings()
+    /**
+     * Returns the Query Settings.
+     *
+     * @return Tx_Extbase_Persistence_QuerySettingsInterface $querySettings The Query Settings
+     * @api This method is not part of FLOW3 API
+     */
+    public function getQuerySettings()
     {
-		if (!($this->querySettings instanceof Tx_Extbase_Persistence_QuerySettingsInterface)) {
+        if (!($this->querySettings instanceof Tx_Extbase_Persistence_QuerySettingsInterface)) {
             throw new Tx_Extbase_Persistence_Exception('Tried to get the query settings without seting them before.', 1248689115);
         }
-		return $this->querySettings;
-	}
+        return $this->querySettings;
+    }
 
-	/**
-	 * Returns the type this query cares for.
-	 *
-	 * @return string
-	 * @api
-	 */
-	public function getType()
+    /**
+     * Returns the type this query cares for.
+     *
+     * @return string
+     * @api
+     */
+    public function getType()
     {
-		return $this->type;
-	}
+        return $this->type;
+    }
 
     /**
      * Executes the query against the backend and returns the result
@@ -124,7 +130,7 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
      */
     public function execute()
     {
-        if ($this->getQuerySettings()->getReturnRawQueryResult()) {
+        if ($this->querySettings && $this->getQuerySettings()->getReturnRawQueryResult()) {
             return $this->queryBuilder->getQuery()->getResult();
         }
         return new Tx_Doctrine2_QueryResult($this);
@@ -142,7 +148,7 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
         $dqlQuery = clone $originalQuery;
         $dqlQuery->setParameters($originalQuery->getParameters());
         $dqlQuery->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array('Doctrine\ORM\Tools\Pagination\CountWalker'));
-        return (int)$dqlQuery->getSingleScalarResult();
+        return (int) $dqlQuery->getSingleScalarResult();
     }
 
     /**
@@ -440,7 +446,7 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
             }
         }
         if (is_array($this->joins)) {
-            foreach($this->joins as $joinAlias => $join) {
+            foreach ($this->joins as $joinAlias => $join) {
                 $this->queryBuilder->leftJoin($join, $joinAlias);
             }
         }
@@ -458,5 +464,6 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
     {
         $this->queryBuilder = clone $this->queryBuilder;
     }
+
 }
 

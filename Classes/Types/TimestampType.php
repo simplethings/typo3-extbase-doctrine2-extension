@@ -1,6 +1,7 @@
 <?php
 
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * New datatype for integer based timestamps.
@@ -31,6 +32,11 @@ class Tx_Doctrine2_Types_TimestampType extends Type
             throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeFormatString());
         }
         return $val;
+    }
+
+    public function getName()
+    {
+        return 'timestamp';
     }
 }
 

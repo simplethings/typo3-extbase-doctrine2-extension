@@ -59,13 +59,17 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
             return;
         }
 
-        if ( ! is_subclass_of($className, 'Tx_Doctrine2_DomainObject_AbstractDomainObject')) {
+        if ( ! is_subclass_of($className, 'Tx_Doctrine2_DomainObject_AbstractEntity')) {
             return;
         }
 
         $dataMap = $this->metadataService->getDataMap($className);
         if ( ! $dataMap) {
             return;
+        }
+        
+        if ($metadata->reflClass->getShortname() == $metadata->table['name']) {
+            $metadata->table['name'] = strtolower($metadata->table['name']);
         }
 
         $metadata->setPrimaryTable(array('name' => $dataMap->getTableName()));
@@ -76,8 +80,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
             $metadata->mapField(array(
                 'fieldName'     => 'pid',
                 'columnName'    => $pidColumnName,
-                'type'          => 'integer',
-                'inherited'     => 'Tx_Extbase_DomainObject_AbstractDomainObject',
+                'type'          => 'integer'
             ));
         }
 
@@ -85,8 +88,7 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
             $metadata->mapField(array(
                 'fieldName'     => 'languageUid',
                 'columnName'    => $lidColumnName,
-                'type'          => 'integer',
-                'inherited'     => 'Tx_Extbase_DomainObject_AbstractDomainObject',
+                'type'          => 'integer'
             ));
         }
 

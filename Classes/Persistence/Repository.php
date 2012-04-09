@@ -140,7 +140,7 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
 
     public function findAll()
     {
-        return $this->entityManager->getRepository($this->objectType)->findBy(array(), $this->defaultOrderings);
+        return $this->createQuery()->execute();
     }
 
     public function countAll()
