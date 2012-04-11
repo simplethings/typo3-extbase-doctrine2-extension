@@ -61,3 +61,10 @@ Generation of proxy objects is hooked into the TYPO3 Cache clearing mechanism.
 * This extension follows Doctrine coding standards. Bite me :-)
 * For tests run "git submodule update --init", then "phpunit" from the main directory. Non-extbase TYPO3 code will be re-implemented as real stubs.
 
+## Extbase to Doctrine2 Migration
+
+* For all Domain_Model classes, change all `Tx_Extbase_DomainObject_*` usages to `Tx_Doctrine2_DomainObject_AbstractEntity`
+* Make all repositories implement `Tx_Doctrine2_Persistence_Repository` instead of `Tx_Extbase_Persistence_Repository`
+* All usages of FrontendUser and FrontendUserGroup have to use Tx_Doctrine2_Domain_Model namespace instead.
+* Usages of @var SplObjectStorage<...> have to be changed to use @OneToMany or @ManyToMany. Additionaly the usage of SplObjectStorage has to be removed and replaced with \Doctrine\Common\Collections\ArrayCollection.
+* No automatic persistance happens (at all!). You have to inject Tx_Doctrine2_Manager to your controller and call `Tx_Doctrine2_Manager#persistAll()` manually.

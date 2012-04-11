@@ -1,0 +1,8 @@
+config.tx_extbase {
+    objects {
+        Tx_Extbase_Persistence_QueryFactoryInterface {
+            className = Tx_Doctrine2_QueryFactory
+        }
+    }
+}
+

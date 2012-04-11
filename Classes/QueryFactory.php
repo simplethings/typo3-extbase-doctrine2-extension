@@ -3,23 +3,26 @@
 class Tx_Doctrine2_QueryFactory implements Tx_Extbase_Persistence_QueryFactoryInterface
 {
     /**
-     * @var \Doctrine\ORM\EntityManager
+     * @var Tx_Doctrine2_Manager
      */
-    protected $entityManager;
+    protected $manager;
 
     /**
-     * @param \Doctrine\Common\Persistence\ObjectManager $entityManager
+     * @param Tx_Doctrine2_Manager
      * @return void
      */
-    public function injectEntityManager(\Doctrine\Common\Persistence\ObjectManager $entityManager)
+    public function injectManager(Tx_Doctrine2_Manager $manager)
     {
-        $this->entityManager = $entityManager;
+        $this->manager = $manager;
     }
 
+    /**
+     * @return Tx_Doctrine2_Query
+     */
     public function create($className)
     {
         $query = new Tx_Doctrine2_Query($className);
-        $query->injectEntityManager($this->entityManager);
+        $query->injectEntityManager($this->manager->getEntityManager());
         return $query;
     }
 }

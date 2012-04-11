@@ -23,6 +23,11 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
     protected $reflectionService;
 
     /**
+     * @var Tx_Extbase_Object_ObjectManagerInterface
+     */
+    protected $objectManager;
+
+    /**
      * Dev mode flag
      *
      * Lazily loads itself using TYPO3 dev ip mechanism if not set explicitly.
@@ -72,6 +77,11 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
     public function injectDataMapFactory(Tx_Extbase_Persistence_Mapper_DataMapFactory $factory)
     {
         $this->dataMapFactory = $factory;
+    }
+
+    public function injectObjectManager(Tx_Extbase_Object_ObjectManagerInterface $manager)
+    {
+        $this->objectManager = $manager;
     }
 
     public function getSession()
@@ -144,6 +154,10 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
 
         $this->entityManager = \Doctrine\ORM\EntityManager::create($dbParams, $config, $evm);
         $this->entityManager->getFilters('enableFields')->enable('enableFields');
+
+        if ($this->objectManager instanceof Tx_Doctrine2_ObjectManager) {
+            $this->objectManager->setEntityManager($this->entityManager);
+        }
 
         return $this->entityManager;
     }

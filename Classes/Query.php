@@ -8,7 +8,6 @@
  */
 class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
 {
-
     /**
      * @var string
      */
@@ -68,7 +67,7 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
     {
         $this->entityClassName = $entityClassName;
     }
-    
+
     public function getResult()
     {
         return $this->queryBuilder->getQuery()->getResult();
