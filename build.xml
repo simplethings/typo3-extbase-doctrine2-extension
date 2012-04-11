@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="Tx_Doctrine2" default="build" basedir=".">
+    <target name="clean">
+        <delete dir="build" />
+        <mkdir dir="${basedir}/build/api"/>
+        <mkdir dir="${basedir}/build/coverage"/>
+        <mkdir dir="${basedir}/build/logs"/>
+        <mkdir dir="${basedir}/build/pdepend"/>
+    </target>
+
+    <target name="build" depends="clean">
+        <copy todir="build/tx_doctrine2">
+            <fileset dir=".">
+                <exclude name="build/**" />
+                <exclude name="Tests/**" />
+                <exclude name="vendor/extbase/**" />
+            </fileset>
+        </copy>
+        <exec executable="php">
+            <arg value="build_extension.php" />
+        </exec>
+    </target>
+</project>
