@@ -36,13 +36,6 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
      */
     static protected $devMode = null;
 
-    /**
-     * Flag if autoloading is bootstrapped.
-     *
-     * @var bool
-     */
-    static protected $bootstrapped = false;
-
     static public function setDevMode($devMode)
     {
         self::$devMode = (bool)$devMode;
@@ -99,18 +92,6 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
         $this->entityManager = null;
     }
 
-    static private function bootstrapAutoloading()
-    {
-        if (!self::$bootstrapped) {
-            self::$bootstrapped = true;
-
-            require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
-            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/');
-
-            \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
-        }
-    }
-
     /**
      * Get the Doctrine EntityManager
      *
@@ -121,8 +102,7 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
         if ($this->entityManager !== null) {
             return $this->entityManager;
         }
-
-        self::bootstrapAutoloading();
+        Tx_Doctrine2_ExtbaseBootstrap::bootstrapAutoloading();
 
         // Dev Mode decides if proxies are auto-generated every request
         // and what kind of cache is used for the metadata.

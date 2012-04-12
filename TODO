@@ -3,3 +3,5 @@
 * Tx_Extbase_Dispatcher#injectPersistenceManager only accepts implementation, not interface
 * Utility class Tx_Doctrine2_Utility_Extension should be simpler to override
 * Why to manually injectReflectionService on DataMapFactory?
+* Tx_Extbase_Property_Mapper#queryFactory accepts only implementation
+* Extbase im Backend Bootstrap? (Blog Example Delete Comment fails)

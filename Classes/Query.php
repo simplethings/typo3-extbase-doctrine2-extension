@@ -147,7 +147,16 @@ class Tx_Doctrine2_Query implements Tx_Extbase_Persistence_QueryInterface
         $dqlQuery = clone $originalQuery;
         $dqlQuery->setParameters($originalQuery->getParameters());
         $dqlQuery->setHint(\Doctrine\ORM\Query::HINT_CUSTOM_TREE_WALKERS, array('Doctrine\ORM\Tools\Pagination\CountWalker'));
-        return (int) $dqlQuery->getSingleScalarResult();
+        try {
+            return (int) $dqlQuery->getSingleScalarResult();
+        } catch(\Doctrine\ORM\NoResultException $e) {
+            return 0;
+        }
+    }
+
+    public function setSource($var)
+    {
+        // lets just ignore this :)
     }
 
     /**

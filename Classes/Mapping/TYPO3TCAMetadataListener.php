@@ -70,9 +70,9 @@ class Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener implements EventSubscriber
 
         if ($metadata->reflClass->getShortname() == $metadata->table['name']) {
             $metadata->table['name'] = strtolower($metadata->table['name']);
+            $metadata->setPrimaryTable(array('name' => $dataMap->getTableName()));
         }
 
-        $metadata->setPrimaryTable(array('name' => $dataMap->getTableName()));
         // TODO: Save EnableFields and Other metadata stuff into primary table
         // array for later reference in filters and listeners.
 

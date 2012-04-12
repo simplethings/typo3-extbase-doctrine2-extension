@@ -3,6 +3,15 @@ config.tx_extbase {
         Tx_Extbase_Persistence_QueryFactoryInterface {
             className = Tx_Doctrine2_QueryFactory
         }
+        Tx_Extbase_Persistence_QueryFactory {
+            className = Tx_Doctrine2_QueryFactory
+        }
+        Tx_Extbase_MVC_Web_Routing_UriBuilder {
+            className = Tx_Doctrine2_MVC_UriBuilder
+        }
+        Tx_Extbase_Property_Mapper {
+            className = Tx_Doctrine2_Property_Mapper
+        }
     }
 }
 

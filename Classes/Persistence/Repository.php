@@ -25,6 +25,11 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
     protected $objectManager;
 
     /**
+     * @var Tx_Doctrine2_QueryFactory
+     */
+    protected $queryFactory;
+
+    /**
      * All the objects added to the repository during the scope
      * of the current "object transaction".
      *
@@ -83,6 +88,11 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
     public function setEntityManager(ObjectManager $em)
     {
         $this->entityManager = $em;
+    }
+
+    public function injectQueryFactory(Tx_Doctrine2_QueryFactory $queryFactory)
+    {
+        $this->queryFactory = $queryFactory;
     }
 
     protected function getRepositoryClassName()
@@ -172,8 +182,7 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
 
     public function createQuery()
     {
-        $query = new Tx_Doctrine2_Query($this->objectType);
-        $query->injectEntityManager($this->entityManager);
+        $query = $this->queryFactory->create($this->objectType);
 
         if ($this->defaultOrderings) {
             $query->setOrderings($this->defaultOrderings);

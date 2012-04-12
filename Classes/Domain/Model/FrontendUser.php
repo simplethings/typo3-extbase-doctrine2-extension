@@ -25,7 +25,7 @@
 /**
  * A Frontend User
  *
- * @entity
+ * @Entity
  * @Table(name="fe_users")
  */
 class Tx_Doctrine2_Domain_Model_FrontendUser extends Tx_Doctrine2_DomainObject_AbstractEntity {

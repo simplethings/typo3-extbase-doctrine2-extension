@@ -5,6 +5,25 @@
  */
 class Tx_Doctrine2_ExtbaseBootstrap extends Tx_Extbase_Core_Bootstrap
 {
+
+    /**
+     * Flag if autoloading is bootstrapped.
+     *
+     * @var bool
+     */
+    static protected $bootstrapped = false;
+
+    static public function bootstrapAutoloading()
+    {
+        if (!self::$bootstrapped) {
+            self::$bootstrapped = true;
+
+            require_once __DIR__ . '/../vendor/doctrine-orm/lib/Doctrine/ORM/Tools/Setup.php';
+            \Doctrine\ORM\Tools\Setup::registerAutoloadGit(__DIR__ . '/../vendor/doctrine-orm/');
+
+            \Doctrine\Common\Annotations\AnnotationRegistry::registerFile(__DIR__ . "/../vendor/doctrine-orm/lib/Doctrine/ORM/Mapping/Driver/DoctrineAnnotations.php");
+        }
+    }
     /**
      * Resets global singletons for the next plugin
      *
@@ -17,6 +36,7 @@ class Tx_Doctrine2_ExtbaseBootstrap extends Tx_Extbase_Core_Bootstrap
 
     public function initializePersistence()
     {
+        self::bootstrapAutoloading();
         $this->persistenceManager = $this->objectManager->get('Tx_Doctrine2_Manager'); // singleton
     }
 
