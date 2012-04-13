@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @MappedSuperclass 
+ * @MappedSuperclass
  */
 abstract class Tx_Doctrine2_DomainObject_AbstractEntity extends Tx_Extbase_DomainObject_AbstractEntity
 {
@@ -14,17 +14,17 @@ abstract class Tx_Doctrine2_DomainObject_AbstractEntity extends Tx_Extbase_Domai
     /**
      * @var int The uid of the localized record. In TYPO3 v4.x the property "uid" holds the uid of the record in default language (the translationOrigin).
      */
-    protected $localizedUid;
+    protected $localizedUid = 0;
 
     /**
      * @var int The uid of the language of the object. In TYPO3 v4.x this is the uid of the language record in the table sys_language.
      */
-    protected $languageUid;
+    protected $languageUid = 0;
 
     /**
      * @var int The id of the page the record is "stored".
      */
-    protected $pid;
+    protected $pid = 0;
 
     /**
      * This is the magic __wakeup() method. It's invoked by the unserialize statement in the reconstitution process
