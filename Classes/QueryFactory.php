@@ -3,7 +3,7 @@
 class Tx_Doctrine2_QueryFactory implements Tx_Extbase_Persistence_QueryFactoryInterface
 {
     /**
-     * @var Tx_Doctrine2_Manager
+     * @var Tx_Extbase_Persistence_ManagerInterface
      */
     protected $manager;
 
@@ -18,10 +18,10 @@ class Tx_Doctrine2_QueryFactory implements Tx_Extbase_Persistence_QueryFactoryIn
 	protected $configurationManager;
 
     /**
-     * @param Tx_Doctrine2_Manager
+     * @param Tx_Extbase_Persistence_ManagerInterface
      * @return void
      */
-    public function injectManager(Tx_Doctrine2_Manager $manager)
+    public function injectManager(Tx_Extbase_Persistence_ManagerInterface $manager)
     {
         $this->manager = $manager;
     }
@@ -47,6 +47,10 @@ class Tx_Doctrine2_QueryFactory implements Tx_Extbase_Persistence_QueryFactoryIn
     {
         $query = new Tx_Doctrine2_Query($className);
         $query->injectEntityManager($this->manager->getEntityManager());
+
+        if (!$this->objectManager || !$this->configurationManager) {
+            return $query;
+        }
 
 		$querySettings = $this->objectManager->create('Tx_Extbase_Persistence_QuerySettingsInterface');
 		$frameworkConfiguration = $this->configurationManager->getConfiguration(Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);

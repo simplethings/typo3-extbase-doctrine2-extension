@@ -9,8 +9,16 @@ class Tx_Doctrine2_Tests_Persistence_RepositoryTest extends Tx_Doctrine2_Tests_T
     public function setUp()
     {
         parent::setUp();
+
+        $manager = new Tx_Doctrine2_Manager;
+        $manager->setEntityManager($this->entityManager);
+
+        $factory = new Tx_Doctrine2_QueryFactory;
+        $factory->injectManager($manager);
+
         $this->repository = new Tx_TestApp_Domain_Repository_PersonRepository(null);
         $this->repository->setEntityManager($this->entityManager);
+        $this->repository->injectQueryFactory($factory);
     }
 
     public function testGetRepositoryClassName()
@@ -56,7 +64,7 @@ class Tx_Doctrine2_Tests_Persistence_RepositoryTest extends Tx_Doctrine2_Tests_T
         $this->loadFixture();
 
         $objects = $this->repository->findAll();
-        $this->assertInternalType('array', $objects);
+        $this->assertInstanceOf('Tx_Doctrine2_QueryResult', $objects);
         $this->assertEquals(2, count($objects));
     }
 
@@ -80,15 +88,19 @@ class Tx_Doctrine2_Tests_Persistence_RepositoryTest extends Tx_Doctrine2_Tests_T
     public function testCreateQuery()
     {
         $settings = $this->getMock('Tx_Extbase_Persistence_QuerySettingsInterface');
+        $factory = $this->getMock('Tx_Extbase_Persistence_QueryFactoryInterface');
+        $factory->expects($this->once())
+                ->method('create')
+                ->with($this->equalTo('Tx_TestApp_Domain_Model_Person'))
+                ->will($this->returnValue($this->getMock('Tx_Extbase_Persistence_QueryInterface')));
 
+        $this->repository->injectQueryFactory($factory);
         $this->repository->setDefaultOrderings(array("uid" => "ASC"));
         $this->repository->setDefaultQuerySettings($settings);
 
         $query = $this->repository->createQuery();
 
         $this->assertInstanceOf('Tx_Extbase_Persistence_QueryInterface', $query);
-        $this->assertEquals(array("uid" => "ASC"), $query->getOrderings());
-        $this->assertSame($settings, $query->getQuerySettings());
     }
 
     public function testCreateDqlQuery()

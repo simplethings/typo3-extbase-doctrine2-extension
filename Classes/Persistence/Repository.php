@@ -80,9 +80,9 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
         return $this->objectType;
     }
 
-    public function injectDoctrine2Manager(Tx_Doctrine2_Manager $doctrine2Manager)
+    public function injectPersistenceManager(Tx_Extbase_Persistence_ManagerInterface $manager)
     {
-        $this->entityManager = $doctrine2Manager->getEntityManager();
+        $this->entityManager = $manager->getEntityManager();
     }
 
     public function setEntityManager(ObjectManager $em)
@@ -90,7 +90,7 @@ class Tx_Doctrine2_Persistence_Repository implements Tx_Extbase_Persistence_Repo
         $this->entityManager = $em;
     }
 
-    public function injectQueryFactory(Tx_Doctrine2_QueryFactory $queryFactory)
+    public function injectQueryFactory(Tx_Extbase_Persistence_QueryFactoryInterface $queryFactory)
     {
         $this->queryFactory = $queryFactory;
     }

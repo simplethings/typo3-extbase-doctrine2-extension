@@ -3,7 +3,7 @@
 /**
  * @Entity
  */
-class Tx_Doctrine2_Tests_Model_Post extends Tx_Doctrine2_DomainObject_AbstractDomainObject
+class Tx_Doctrine2_Tests_Model_Post extends Tx_Doctrine2_DomainObject_AbstractEntity
 {
     /**
      * @var string

@@ -92,6 +92,11 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
         $this->entityManager = null;
     }
 
+    public function setEntityManager(\Doctrine\ORM\EntityManager $em)
+    {
+        $this->entityManager = $em;
+    }
+
     /**
      * Get the Doctrine EntityManager
      *
