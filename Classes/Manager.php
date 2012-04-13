@@ -203,8 +203,14 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
         $metadataListener = new Tx_Doctrine2_Mapping_TYPO3TCAMetadataListener;
         $metadataListener->injectMetadataService($metadataService);
 
+
         $evm = new \Doctrine\Common\EventManager;
         $evm->addEventSubscriber($metadataListener);
+
+        if ($this->objectManager) {
+            $storagePidListener = $this->objectManager->get('Tx_Doctrine2_Persistence_StoragePidListener');
+            $evm->addEventSubscriber($storagePidListener);
+        }
 
         $this->configureEventManager($evm);
 
