@@ -5,3 +5,4 @@
 * Why to manually injectReflectionService on DataMapFactory?
 * Tx_Extbase_Property_Mapper#queryFactory accepts only implementation
 * Extbase im Backend Bootstrap? (Blog Example Delete Comment fails)
+* ext_tables.php Hack für Modules auf ObjectManager Override (TYPOscript umstellen mit Master/Extbase/TYPO3)

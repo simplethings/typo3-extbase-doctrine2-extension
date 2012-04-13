@@ -84,7 +84,7 @@ class Tx_Doctrine2_Manager implements Tx_Extbase_Persistence_ManagerInterface, t
 
     public function getBackend()
     {
-        throw new \RuntimeException("Deprecated on interface, not implemented.");
+        return new Tx_Doctrine2_DoctrineBackend();
     }
 
     public function resetEntityManager()

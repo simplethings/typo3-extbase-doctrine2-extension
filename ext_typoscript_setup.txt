@@ -12,6 +12,12 @@ config.tx_extbase {
         Tx_Extbase_Property_Mapper {
             className = Tx_Doctrine2_Property_Mapper
         }
+        Tx_Extbase_Core_Bootstrap {
+            className = Tx_Doctrine2_ExtbaseBootstrap
+        }
+        Tx_Extbase_Persistence_ManagerInterface {
+            className = Tx_Doctrine2_Manager
+        }
     }
 }
 
